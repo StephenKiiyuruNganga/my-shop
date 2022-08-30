@@ -2,7 +2,8 @@ import { AddShoppingCart } from "@mui/icons-material"
 import { Badge, Drawer, Grid, LinearProgress } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
-import { Wrapper } from "./App.styles"
+import { StyledIconButton, Wrapper } from "./App.styles"
+import Cart from "./components/Cart"
 import ProductCard from "./components/ProductCard"
 
 export interface Product {
@@ -21,6 +22,9 @@ const getProducts = async (): Promise<Product[]> => {
 }
 
 const App = () => {
+  const [cartIsOpen, setCartIsOpen] = useState(false)
+  const [cartItems, setCartItems] = useState<Product[]>([])
+
   const {
     data: productsData,
     isLoading,
@@ -33,11 +37,17 @@ const App = () => {
   }, [productsData])
 
   // TODO: add logic later
-  const getTotalItems = () => {}
+  const getTotalItems = (items: Product[]) => {
+    return items.reduce(
+      (previousCount: number, item) => previousCount + item.amount,
+      0
+    )
+  }
+
   const addToCartHandler = (clickedItem: Product) => {
     console.log(clickedItem)
   }
-  const RemoveFromCartHandler = () => {}
+  const removeFromCartHandler = () => {}
 
   if (isLoading) return <LinearProgress />
 
@@ -45,6 +55,22 @@ const App = () => {
 
   return (
     <Wrapper>
+      <Drawer
+        anchor="right"
+        open={cartIsOpen}
+        onClose={() => setCartIsOpen(false)}
+      >
+        <Cart
+          cartItems={cartItems}
+          onAdd={addToCartHandler}
+          onRemove={removeFromCartHandler}
+        />
+      </Drawer>
+      <StyledIconButton onClick={() => setCartIsOpen(true)}>
+        <Badge badgeContent={getTotalItems(cartItems)} color="error">
+          <AddShoppingCart />
+        </Badge>
+      </StyledIconButton>
       <Grid container spacing={3}>
         {productsData?.map((product) => (
           <Grid key={product.id} item xs={12} sm={4}>
