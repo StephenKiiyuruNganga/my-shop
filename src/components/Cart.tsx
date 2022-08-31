@@ -9,13 +9,22 @@ interface CartProps {
 }
 
 const Cart = ({ cartItems, onAdd, onRemove }: CartProps) => {
+  const calculateTotalCost = (items: Product[]) =>
+    items.reduce((ack, item) => ack + item.amount * item.price, 0)
+
   return (
     <Wrapper>
       <h2>Your shopping cart</h2>
       {cartItems.length === 0 ? <p>No items in cart</p> : null}
       {cartItems.map((product) => (
-        <CartItem key={product.id} />
+        <CartItem
+          key={product.id}
+          item={product}
+          onAdd={onAdd}
+          onRemove={onRemove}
+        />
       ))}
+      <h2>Total: ${calculateTotalCost(cartItems).toFixed(2)}</h2>
     </Wrapper>
   )
 }
